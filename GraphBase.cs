@@ -5,9 +5,11 @@ using System.Linq;
 
 namespace Diese.Graph
 {
-    public class GraphBase<TVertex, TEdge> : IGraph<TVertex, TEdge>
-        where TVertex : VertexBase<TVertex, TEdge>
-        where TEdge : EdgeBase<TEdge, TVertex>
+    public class GraphBase<TGraph, TVertex, TEdge, TVisitor> : IGraph<TGraph, TVertex, TEdge, TVisitor>
+        where TGraph : GraphBase<TGraph, TVertex, TEdge, TVisitor>
+        where TVertex : VertexBase<TGraph, TVertex, TEdge, TVisitor>
+        where TEdge : EdgeBase<TGraph, TVertex, TEdge, TVisitor>
+        where TVisitor : VisitorBase<TGraph, TVertex, TEdge, TVisitor>
     {
         private readonly List<TVertex> _vertices;
         private readonly List<TEdge> _edges;
@@ -35,10 +37,7 @@ namespace Diese.Graph
 
         public TEdge this[TVertex start, TVertex end]
         {
-            get
-            {
-                return _vertices.Contains(start) ? start.Edges.FirstOrDefault(x => x.End == end) : null;
-            }
+            get { return _vertices.Contains(start) ? start.Edges.FirstOrDefault(x => x.End == end) : null; }
         }
 
         public virtual void AddVertex(TVertex vertex)

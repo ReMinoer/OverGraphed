@@ -2,9 +2,11 @@
 
 namespace Diese.Graph
 {
-    public interface IGraph<TVertex, TEdge> : IEnumerable<TVertex>
-        where TVertex : IVertex<TVertex, TEdge>
-        where TEdge : IEdge<TEdge, TVertex>
+    public interface IGraph<TGraph, TVertex, TEdge, in TVisitor> : IEnumerable<TVertex>
+        where TGraph : IGraph<TGraph, TVertex, TEdge, TVisitor>
+        where TVertex : IVertex<TGraph, TVertex, TEdge, TVisitor>
+        where TEdge : IEdge<TGraph, TVertex, TEdge, TVisitor>
+        where TVisitor : IVisitor<TGraph, TVertex, TEdge, TVisitor>
     {
         IReadOnlyCollection<TVertex> Vertices { get; }
         IReadOnlyCollection<TEdge> Edges { get; }

@@ -2,9 +2,11 @@
 
 namespace Diese.Graph
 {
-    public class VertexBase<TVertex, TEdge> : IVertex<TVertex, TEdge>
-        where TVertex : VertexBase<TVertex, TEdge>
-        where TEdge : EdgeBase<TEdge, TVertex>
+    public class VertexBase<TGraph, TVertex, TEdge, TVisitor> : IVertex<TGraph, TVertex, TEdge, TVisitor>
+        where TGraph : GraphBase<TGraph, TVertex, TEdge, TVisitor>
+        where TVertex : VertexBase<TGraph, TVertex, TEdge, TVisitor>
+        where TEdge : EdgeBase<TGraph, TVertex, TEdge, TVisitor>
+        where TVisitor : VisitorBase<TGraph, TVertex, TEdge, TVisitor>
     {
         private readonly List<TEdge> _edges;
         private readonly IReadOnlyCollection<TEdge> _readOnlyEdges;
@@ -37,6 +39,11 @@ namespace Diese.Graph
             _readOnlyEdges = _edges.AsReadOnly();
             _readOnlyPredecessors = _predecessors.AsReadOnly();
             _readOnlySuccessors = _successors.AsReadOnly();
+        }
+
+        public virtual void Accept(TVisitor visitor)
+        {
+            visitor.Visit((TVertex)this);
         }
 
         internal void AddEdge(TEdge edge)
