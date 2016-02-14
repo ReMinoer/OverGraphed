@@ -1,12 +1,20 @@
 ﻿namespace Diese.Graph
 {
-    public interface IEdge<TGraph, out TVertex, TEdge, TVisitor>
-        where TGraph : IGraph<TGraph, TVertex, TEdge, TVisitor>
-        where TVertex : IVertex<TGraph, TVertex, TEdge, TVisitor>
-        where TEdge : IEdge<TGraph, TVertex, TEdge, TVisitor>
-        where TVisitor : IVisitor<TGraph, TVertex, TEdge, TVisitor>
+    public interface IEdge<out TVertexBase, TEdgeBase>
+        where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>
+        where TEdgeBase : class, IEdge<TVertexBase, TEdgeBase>
     {
-        TVertex Start { get; }
-        TVertex End { get; }
+        TVertexBase Start { get; }
+        TVertexBase End { get; }
+    }
+
+    public interface IEdge<out TStart, out TEnd, out TVertexBase, TEdgeBase> : IEdge<TVertexBase, TEdgeBase>
+        where TStart : TVertexBase
+        where TEnd : TVertexBase
+        where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>
+        where TEdgeBase : class, IEdge<TVertexBase, TEdgeBase>
+    {
+        new TStart Start { get; }
+        new TEnd End { get; }
     }
 }

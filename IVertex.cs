@@ -2,15 +2,12 @@
 
 namespace Diese.Graph
 {
-    public interface IVertex<TGraph, out TVertex, out TEdge, in TVisitor>
-        where TGraph : IGraph<TGraph, TVertex, TEdge, TVisitor>
-        where TVertex : IVertex<TGraph, TVertex, TEdge, TVisitor>
-        where TEdge : IEdge<TGraph, TVertex, TEdge, TVisitor>
-        where TVisitor : IVisitor<TGraph, TVertex, TEdge, TVisitor>
+    public interface IVertex<out TVertexBase, out TEdgeBase>
+        where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>
+        where TEdgeBase : class, IEdge<TVertexBase, TEdgeBase>
     {
-        IReadOnlyCollection<TEdge> Edges { get; }
-        IReadOnlyCollection<TVertex> Predecessors { get; }
-        IReadOnlyCollection<TVertex> Successors { get; }
-        void Accept(TVisitor visitor);
+        IEnumerable<TEdgeBase> Edges { get; }
+        IEnumerable<TVertexBase> Predecessors { get; }
+        IEnumerable<TVertexBase> Successors { get; }
     }
 }
