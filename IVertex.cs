@@ -6,8 +6,7 @@ namespace Diese.Graph
         where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>
         where TEdgeBase : class, IEdge<TVertexBase, TEdgeBase>
     {
-        IEnumerable<TEdgeBase> Edges { get; }
-        IEnumerable<TVertexBase> Predecessors { get; }
-        IEnumerable<TVertexBase> Successors { get; }
+        IEnumerable<TEdgeBase> Predecessors { get; }
+        IEnumerable<TEdgeBase> Successors { get; }
     }
 }

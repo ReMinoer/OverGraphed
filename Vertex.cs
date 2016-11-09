@@ -8,31 +8,19 @@ namespace Diese.Graph
     {
         private readonly List<TEdgeBase> _edges;
         private readonly IReadOnlyCollection<TEdgeBase> _readOnlyEdges;
-        private readonly List<TVertexBase> _predecessors;
-        private readonly IReadOnlyCollection<TVertexBase> _readOnlyPredecessors;
-        private readonly List<TVertexBase> _successors;
-        private readonly IReadOnlyCollection<TVertexBase> _readOnlySuccessors;
-
-        public IEnumerable<TEdgeBase> Edges
-        {
-            get { return _readOnlyEdges; }
-        }
-
-        public IEnumerable<TVertexBase> Predecessors
-        {
-            get { return _readOnlyPredecessors; }
-        }
-
-        public IEnumerable<TVertexBase> Successors
-        {
-            get { return _readOnlySuccessors; }
-        }
+        private readonly List<TEdgeBase> _predecessors;
+        private readonly IReadOnlyCollection<TEdgeBase> _readOnlyPredecessors;
+        private readonly List<TEdgeBase> _successors;
+        private readonly IReadOnlyCollection<TEdgeBase> _readOnlySuccessors;
+        public IEnumerable<TEdgeBase> Edges => _readOnlyEdges;
+        public IEnumerable<TEdgeBase> Predecessors => _readOnlyPredecessors;
+        public IEnumerable<TEdgeBase> Successors => _readOnlySuccessors;
 
         public Vertex()
         {
             _edges = new List<TEdgeBase>();
-            _predecessors = new List<TVertexBase>();
-            _successors = new List<TVertexBase>();
+            _predecessors = new List<TEdgeBase>();
+            _successors = new List<TEdgeBase>();
 
             _readOnlyEdges = _edges.AsReadOnly();
             _readOnlyPredecessors = _predecessors.AsReadOnly();
@@ -42,9 +30,9 @@ namespace Diese.Graph
         internal void AddEdge(TEdgeBase edge)
         {
             if (this == edge.Start)
-                _successors.Add(edge.End);
+                _successors.Add(edge);
             else
-                _predecessors.Add(edge.Start);
+                _predecessors.Add(edge);
 
             _edges.Add(edge);
         }
@@ -52,9 +40,9 @@ namespace Diese.Graph
         internal void RemoveEdge(TEdgeBase edge)
         {
             if (this == edge.Start)
-                _successors.Remove(edge.End);
+                _successors.Remove(edge);
             else
-                _predecessors.Remove(edge.Start);
+                _predecessors.Remove(edge);
 
             _edges.Remove(edge);
         }

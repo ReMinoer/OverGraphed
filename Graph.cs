@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Diese.Graph
 {
-    public class Graph<TVertexBase, TEdgeBase> : IGraph<TVertexBase, TEdgeBase>
+    public class Graph<TVertexBase, TEdgeBase> : IWritableGraph<TVertexBase, TEdgeBase>
         where TVertexBase : Vertex<TVertexBase, TEdgeBase>
         where TEdgeBase : class, IEdge<TVertexBase, TEdgeBase>
     {
@@ -12,16 +12,8 @@ namespace Diese.Graph
         private readonly List<TEdgeBase> _edges;
         private readonly IReadOnlyCollection<TVertexBase> _readOnlyVertices;
         private readonly IReadOnlyCollection<TEdgeBase> _readOnlyEdges;
-
-        public IEnumerable<TVertexBase> Vertices
-        {
-            get { return _readOnlyVertices; }
-        }
-
-        public IEnumerable<TEdgeBase> Edges
-        {
-            get { return _readOnlyEdges; }
-        }
+        public IEnumerable<TVertexBase> Vertices => _readOnlyVertices;
+        public IEnumerable<TEdgeBase> Edges => _readOnlyEdges;
 
         public Graph()
         {
@@ -57,11 +49,6 @@ namespace Diese.Graph
 
             ClearEdges(vertex);
             _vertices.Remove(vertex);
-        }
-
-        public virtual bool ContainsVertex(TVertexBase vertex)
-        {
-            return _vertices.Contains(vertex);
         }
 
         public virtual void ClearVertices()
@@ -100,7 +87,7 @@ namespace Diese.Graph
 
         public void RemoveEdge(TEdgeBase edge)
         {
-            if (!ContainsEdge(edge))
+            if (!ContainsEdge(edge.Start, edge.End))
                 throw new ArgumentException("Edge doesn't exist !");
 
             edge.Start.RemoveEdge(edge);
@@ -117,18 +104,6 @@ namespace Diese.Graph
                 throw new ArgumentException("End vertex provided is not in the graph !");
 
             return _edges.Any(x => x.Start == from && x.End == to);
-        }
-
-        public bool ContainsEdge(TEdgeBase edge)
-        {
-            if (_vertices.Contains(edge.Start))
-            {
-                TEdgeBase other = edge.Start.Edges.FirstOrDefault(x => x.End == edge.End);
-                if (edge == other)
-                    return true;
-            }
-
-            return false;
         }
 
         public virtual void ClearEdges(TVertexBase vertex)
