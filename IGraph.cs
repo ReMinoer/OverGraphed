@@ -2,12 +2,18 @@
 
 namespace Diese.Graph
 {
-    public interface IGraph<TVertexBase, out TEdgeBase>
+    public interface IGraphData<out TVertexBase, out TEdgeBase>
         where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>
         where TEdgeBase : class, IEdge<TVertexBase, TEdgeBase>
     {
         IEnumerable<TVertexBase> Vertices { get; }
         IEnumerable<TEdgeBase> Edges { get; }
+    }
+
+    public interface IGraph<TVertexBase, out TEdgeBase> : IGraphData<TVertexBase, TEdgeBase>
+        where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>
+        where TEdgeBase : class, IEdge<TVertexBase, TEdgeBase>
+    {
         TEdgeBase this[TVertexBase start, TVertexBase end] { get; }
         bool ContainsEdge(TVertexBase from, TVertexBase to);
     }
