@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Diese.Graph
+namespace OverGraphed
 {
     public class Graph<TVertexBase, TEdgeBase> : IWritableGraph<TVertexBase, TEdgeBase>
         where TVertexBase : Vertex<TVertexBase, TEdgeBase>
@@ -10,8 +11,8 @@ namespace Diese.Graph
     {
         private readonly List<TVertexBase> _vertices;
         private readonly List<TEdgeBase> _edges;
-        private readonly IReadOnlyCollection<TVertexBase> _readOnlyVertices;
-        private readonly IReadOnlyCollection<TEdgeBase> _readOnlyEdges;
+        private readonly ReadOnlyCollection<TVertexBase> _readOnlyVertices;
+        private readonly ReadOnlyCollection<TEdgeBase> _readOnlyEdges;
         public IEnumerable<TVertexBase> Vertices => _readOnlyVertices;
         public IEnumerable<TEdgeBase> Edges => _readOnlyEdges;
 
@@ -20,8 +21,8 @@ namespace Diese.Graph
             _vertices = new List<TVertexBase>();
             _edges = new List<TEdgeBase>();
 
-            _readOnlyVertices = _vertices.AsReadOnly();
-            _readOnlyEdges = _edges.AsReadOnly();
+            _readOnlyVertices = new ReadOnlyCollection<TVertexBase>(_vertices);
+            _readOnlyEdges = new ReadOnlyCollection<TEdgeBase>(_edges);
         }
 
         public TEdgeBase this[TVertexBase start, TVertexBase end]

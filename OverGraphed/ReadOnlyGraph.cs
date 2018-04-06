@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Diese.Graph
+namespace OverGraphed
 {
     public class ReadOnlyGraph<TVertex, TEdge> : IGraph<TVertex, TEdge>
         where TEdge : class, IEdge<TVertex, TEdge>

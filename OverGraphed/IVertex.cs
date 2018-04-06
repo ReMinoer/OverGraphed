@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Diese.Graph
+namespace OverGraphed
 {
     public interface IVertex<out TVertexBase, out TEdgeBase>
         where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
-namespace Diese.Graph
+namespace OverGraphed
 {
     public class Vertex<TVertexBase, TEdgeBase> : IVertex<TVertexBase, TEdgeBase>
         where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>
@@ -22,9 +23,9 @@ namespace Diese.Graph
             _predecessors = new List<TEdgeBase>();
             _successors = new List<TEdgeBase>();
 
-            _readOnlyEdges = _edges.AsReadOnly();
-            _readOnlyPredecessors = _predecessors.AsReadOnly();
-            _readOnlySuccessors = _successors.AsReadOnly();
+            _readOnlyEdges = new ReadOnlyCollection<TEdgeBase>(_edges);
+            _readOnlyPredecessors = new ReadOnlyCollection<TEdgeBase>(_predecessors);
+            _readOnlySuccessors = new ReadOnlyCollection<TEdgeBase>(_successors);
         }
 
         internal void AddEdge(TEdgeBase edge)

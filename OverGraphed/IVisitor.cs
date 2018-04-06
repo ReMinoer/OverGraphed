@@ -1,4 +1,4 @@
-namespace Diese.Graph
+namespace OverGraphed
 {
     public interface IVisitor<TVertexBase, TEdgeBase> : IVisitor<TVertexBase, TVertexBase, TEdgeBase>
         where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>

@@ -1,4 +1,4 @@
-﻿namespace Diese.Graph
+﻿namespace OverGraphed
 {
     public class Edge<TVertexBase, TEdgeBase> : Edge<TVertexBase, TVertexBase, TVertexBase, TEdgeBase>
         where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>
