@@ -2,38 +2,28 @@
 
 namespace OverGraphed
 {
-    public interface IGraphData<out TVertexBase, out TEdgeBase>
-        where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>
-        where TEdgeBase : class, IEdge<TVertexBase, TEdgeBase>
+    // TODO: Graph-wrapped vertices
+    // TODO: Graph as vertex
+    public interface IGraph
     {
-        IEnumerable<TVertexBase> Vertices { get; }
-        IEnumerable<TEdgeBase> Edges { get; }
+        IEnumerable<IVertex> Vertices { get; }
+        IEnumerable<IEdge> Edges { get; }
+        event Event<IVertex> VertexAdded;
+        event Event<IVertex> VertexRemoved;
+        event Event<IEdge> EdgeAdded;
+        event Event<IEdge> EdgeRemoved;
+        event Event Cleared;
     }
 
-    public interface IGraph<TVertexBase, out TEdgeBase> : IGraphData<TVertexBase, TEdgeBase>
+    public interface IGraph<out TVertexBase, out TEdgeBase> : IGraph
         where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>
         where TEdgeBase : class, IEdge<TVertexBase, TEdgeBase>
     {
-        TEdgeBase this[TVertexBase start, TVertexBase end] { get; }
-        bool ContainsEdge(TVertexBase from, TVertexBase to);
-    }
-
-    // TODO : Remove constraint on Edge implemntation
-    // TODO : Pass edge value and not edge implementation
-    public interface IWritableGraph<TVertexBase, TEdgeBase> : IGraph<TVertexBase, TEdgeBase>
-        where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>
-        where TEdgeBase : class, IEdge<TVertexBase, TEdgeBase>
-    {
-        void AddVertex(TVertexBase vertex);
-        void RemoveVertex(TVertexBase vertex);
-        void ClearVertices();
-        void AddEdge<TStart, TEnd, TEdge>(TStart from, TEnd to, TEdge edge)
-            where TStart : TVertexBase
-            where TEnd : TVertexBase
-            where TEdge : Edge<TStart, TEnd, TVertexBase, TEdgeBase>, TEdgeBase;
-        void RemoveEdge(TVertexBase from, TVertexBase to);
-        void RemoveEdge(TEdgeBase edge);
-        void ClearEdges(TVertexBase vertex);
-        void ClearEdges();
+        new IEnumerable<TVertexBase> Vertices { get; }
+        new IEnumerable<TEdgeBase> Edges { get; }
+        new event Event<TVertexBase> VertexAdded;
+        new event Event<TVertexBase> VertexRemoved;
+        new event Event<TEdgeBase> EdgeAdded;
+        new event Event<TEdgeBase> EdgeRemoved;
     }
 }

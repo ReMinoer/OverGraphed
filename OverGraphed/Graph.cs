@@ -1,129 +1,100 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
+using OverGraphed.Base;
 
 namespace OverGraphed
 {
-    public class Graph<TVertexBase, TEdgeBase> : IWritableGraph<TVertexBase, TEdgeBase>
-        where TVertexBase : Vertex<TVertexBase, TEdgeBase>
+    public class Graph<TVertexBase, TEdgeBase> : GraphBase<TVertexBase, TEdgeBase>
+        where TVertexBase : class, IVertex<TVertexBase, TEdgeBase>
         where TEdgeBase : class, IEdge<TVertexBase, TEdgeBase>
     {
-        private readonly List<TVertexBase> _vertices;
-        private readonly List<TEdgeBase> _edges;
-        private readonly ReadOnlyCollection<TVertexBase> _readOnlyVertices;
-        private readonly ReadOnlyCollection<TEdgeBase> _readOnlyEdges;
-        public IEnumerable<TVertexBase> Vertices => _readOnlyVertices;
-        public IEnumerable<TEdgeBase> Edges => _readOnlyEdges;
+        public override event Event<TVertexBase> VertexAdded;
+        public override event Event<TVertexBase> VertexRemoved;
+        public override event Event<TEdgeBase> EdgeAdded;
+        public override event Event<TEdgeBase> EdgeRemoved;
+        public override event Event Cleared;
 
-        public Graph()
+        protected override event Event<IVertex> VertexAddedExplicit;
+        protected override event Event<IVertex> VertexRemovedExplicit;
+        protected override event Event<IEdge> EdgeAddedExplicit;
+        protected override event Event<IEdge> EdgeRemovedExplicit;
+
+        public virtual bool RegisterVertex(TVertexBase vertex)
         {
-            _vertices = new List<TVertexBase>();
-            _edges = new List<TEdgeBase>();
+            if (vertex == null)
+                throw new ArgumentNullException(nameof(vertex));
 
-            _readOnlyVertices = new ReadOnlyCollection<TVertexBase>(_vertices);
-            _readOnlyEdges = new ReadOnlyCollection<TEdgeBase>(_edges);
+            if (!VerticesSet.Add(vertex))
+                return false;
+
+            VertexAdded?.Invoke(this, vertex);
+            VertexAddedExplicit?.Invoke(this, vertex);
+            return true;
         }
 
-        public TEdgeBase this[TVertexBase start, TVertexBase end]
+        public virtual bool UnregisterVertex(TVertexBase vertex)
         {
-            get
+            if (vertex == null)
+                throw new ArgumentNullException(nameof(vertex));
+
+            if (!VerticesSet.Remove(vertex))
+                return false;
+
+            VertexRemoved?.Invoke(this, vertex);
+            VertexRemovedExplicit?.Invoke(this, vertex);
+            return true;
+        }
+
+        public bool RegisterEdge(TEdgeBase edge)
+        {
+            if (edge == null)
+                throw new ArgumentNullException(nameof(edge));
+
+            if (!VerticesSet.Contains(edge.Start) || !VerticesSet.Contains(edge.End))
+                return false;
+
+            if (!EdgesSet.Add(edge))
+                return false;
+
+            EdgeAdded?.Invoke(this, edge);
+            EdgeAddedExplicit?.Invoke(this, edge);
+            return true;
+        }
+
+        public bool UnregisterEdge(TEdgeBase edge)
+        {
+            if (edge == null)
+                throw new ArgumentNullException(nameof(edge));
+
+            if (!EdgesSet.Remove(edge))
+                return false;
+
+            EdgeRemoved?.Invoke(this, edge);
+            EdgeRemovedExplicit?.Invoke(this, edge);
+            return true;
+        }
+
+        public override void Clear()
+        {
+            TVertexBase[] vertices = VerticesSet.ToArray();
+            TEdgeBase[] edges = EdgesSet.ToArray();
+
+            VerticesSet.Clear();
+            EdgesSet.Clear();
+
+            Cleared?.Invoke(this);
+
+            foreach (TEdgeBase edge in edges)
             {
-                return _vertices.Contains(start)
-                    ? start.Edges.FirstOrDefault(x => x.End == end)
-                    : null;
+                EdgeRemoved?.Invoke(this, edge);
+                EdgeRemovedExplicit?.Invoke(this, edge);
             }
-        }
 
-        public virtual void AddVertex(TVertexBase vertex)
-        {
-            if (_vertices.Contains(vertex))
-                throw new ArgumentException("Vertex provided is already in the graph !");
-
-            _vertices.Add(vertex);
-        }
-
-        public virtual void RemoveVertex(TVertexBase vertex)
-        {
-            if (!_vertices.Contains(vertex))
-                throw new ArgumentException("Vertex provided is not in the graph !");
-
-            ClearEdges(vertex);
-            _vertices.Remove(vertex);
-        }
-
-        public virtual void ClearVertices()
-        {
-            _edges.Clear();
-            _vertices.Clear();
-        }
-
-        public void AddEdge<TStart, TEnd, TEdge>(TStart from, TEnd to, TEdge edge)
-            where TStart : TVertexBase
-            where TEnd : TVertexBase
-            where TEdge : Edge<TStart, TEnd, TVertexBase, TEdgeBase>, TEdgeBase
-        {
-            if (ContainsEdge(from, to))
-                throw new ArgumentException("Edge already exist !");
-
-            edge.Start = from;
-            edge.End = to;
-
-            _edges.Add(edge);
-            edge.Start.AddEdge(edge);
-            edge.End.AddEdge(edge);
-        }
-
-        public void RemoveEdge(TVertexBase from, TVertexBase to)
-        {
-            if (!ContainsEdge(from, to))
-                throw new ArgumentException("Edge doesn't exist !");
-
-            TEdgeBase edge = from.Edges.First(x => x.End == to);
-
-            edge.Start.RemoveEdge(edge);
-            edge.End.RemoveEdge(edge);
-            _edges.Remove(edge);
-        }
-
-        public void RemoveEdge(TEdgeBase edge)
-        {
-            if (!ContainsEdge(edge.Start, edge.End))
-                throw new ArgumentException("Edge doesn't exist !");
-
-            edge.Start.RemoveEdge(edge);
-            edge.End.RemoveEdge(edge);
-            _edges.Remove(edge);
-        }
-
-        public bool ContainsEdge(TVertexBase from, TVertexBase to)
-        {
-            if (!_vertices.Contains(from))
-                throw new ArgumentException("Start vertex provided is not in the graph !");
-
-            if (!_vertices.Contains(to))
-                throw new ArgumentException("End vertex provided is not in the graph !");
-
-            return _edges.Any(x => x.Start == from && x.End == to);
-        }
-
-        public virtual void ClearEdges(TVertexBase vertex)
-        {
-            if (!_vertices.Contains(vertex))
-                throw new ArgumentException("Vertex provided is not in the graph !");
-
-            vertex.ClearEdges();
-
-            foreach (TEdgeBase edge in vertex.Edges)
-                _edges.Remove(edge);
-        }
-
-        public virtual void ClearEdges()
-        {
-            foreach (TVertexBase vertex in _vertices)
-                vertex.ClearEdges();
-
-            _edges.Clear();
+            foreach (TVertexBase vertex in vertices)
+            {
+                VertexRemoved?.Invoke(this, vertex);
+                VertexRemovedExplicit?.Invoke(this, vertex);
+            }
         }
     }
 }
