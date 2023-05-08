@@ -28,7 +28,7 @@ namespace OverGraphed
         event Event<IVertex> IGraph.VertexAdded
         {
             add => VertexAddedExplicit += value;
-            remove => VertexAddedExplicit += value;
+            remove => VertexAddedExplicit -= value;
         }
 
         event Event<IVertex> IGraph.VertexRemoved
