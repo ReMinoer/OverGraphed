@@ -38,14 +38,14 @@ namespace OverGraphed.Test.Utils
             return should.HaveCount(items.Length).And.ContainInOrder(items);
         }
 
-        static public IEventRecorder WithArgs(this IEventRecorder eventRecorder, params object[] argsInstances)
+        static public IEventRecording WithArgs(this IEventRecording eventRecording, params object[] argsInstances)
         {
             using (new AssertionScope())
             {
                 foreach (object argsInstance in argsInstances)
-                    eventRecorder.WithArgs<object>(x => x == argsInstance);
+                    eventRecording.WithArgs<object>(x => x == argsInstance);
             }
-            return eventRecorder;
+            return eventRecording;
         }
     }
 }
